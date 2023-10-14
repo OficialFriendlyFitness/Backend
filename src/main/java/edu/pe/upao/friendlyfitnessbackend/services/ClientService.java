@@ -10,26 +10,41 @@ import java.util.Optional;
 @Transactional
 public class ClientService {
 
-    private final ClientRepository clientRespository;
+    private final ClientRepository clientRepository;
 
     public ClientService(ClientRepository clientRespository) {
-        this.clientRespository = clientRespository;
+        this.clientRepository = clientRespository;
     }
 
     public List<Client> getAllClients(){
-        return clientRespository.findAll();
+        return clientRepository.findAll();
     }
 
     public Optional<Client> getClientById(Long clientID){
-        return clientRespository.findById(clientID);
+        return clientRepository.findById(clientID);
     }
 
     public Client addClient(Client clientID){
-        return clientRespository.save(clientID);
+        return clientRepository.save(clientID);
     }
 
     public void deleteUserById(Long clientId){
-        clientRespository.deleteById(clientId);
+        clientRepository.deleteById(clientId);
     }
 
+    public Client verifyAccount(String email, String password) {
+
+        Optional<Client> optionalClient = clientRepository.findByEmail(email);
+
+        if (optionalClient.isPresent()) {
+            Client client = optionalClient.get();
+            // Verificar si la contraseña coincide
+            if (client.getPassword().equals(password)) {
+                // Las credenciales son válidas
+                return client;
+            }
+        }
+        // Si no se encontró el usuario o las credenciales no coinciden, devuelve null
+        return null;
+    }
 }
