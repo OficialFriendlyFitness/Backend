@@ -19,24 +19,10 @@ public class ClientController {
     public ClientController(ClientService clientService) {
         this.clientService = clientService;
     }
-    @GetMapping
-    private List<Client> getAllClients(){
-        return clientService.getAllClients();
-    }
-
-    @GetMapping("/{clientID}")
-    public Client getClientById(@PathVariable Long clientID){
-        return clientService.getClientById(clientID).orElse(new Client());
-    }
 
     @PostMapping
     public void addClient(@RequestBody Client client){
         clientService.addClient(client);
-    }
-
-    @DeleteMapping("/{clientID}")
-    public void deleteClient(@PathVariable Long clientID){
-        clientService.deleteUserById(clientID);
     }
 
     @PostMapping("/login")
