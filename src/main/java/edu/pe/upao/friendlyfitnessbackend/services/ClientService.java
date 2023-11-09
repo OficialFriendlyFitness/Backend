@@ -16,20 +16,8 @@ public class ClientService {
         this.clientRepository = clientRespository;
     }
 
-    public List<Client> getAllClients(){
-        return clientRepository.findAll();
-    }
-
-    public Optional<Client> getClientById(Long clientID){
-        return clientRepository.findById(clientID);
-    }
-
     public Client addClient(Client clientID){
         return clientRepository.save(clientID);
-    }
-
-    public void deleteUserById(Long clientId){
-        clientRepository.deleteById(clientId);
     }
 
     public Client verifyAccount(String email, String password) {
