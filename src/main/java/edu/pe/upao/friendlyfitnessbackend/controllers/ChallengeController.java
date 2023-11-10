@@ -26,8 +26,4 @@ public class ChallengeController {
         challengeService.addChallenge(challenge);
     }
 
-    @DeleteMapping("/{challengeID}")
-    public void deleteRoutine(@PathVariable Long challengeID){
-        challengeService.deleteChallengeById(challengeID);
-    }
 }

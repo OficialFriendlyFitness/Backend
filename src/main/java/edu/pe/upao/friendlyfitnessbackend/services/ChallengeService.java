@@ -1,6 +1,7 @@
 package edu.pe.upao.friendlyfitnessbackend.services;
 
 import edu.pe.upao.friendlyfitnessbackend.models.Challenge;
+import edu.pe.upao.friendlyfitnessbackend.models.Client;
 import edu.pe.upao.friendlyfitnessbackend.models.Routine;
 import edu.pe.upao.friendlyfitnessbackend.repositories.ChallengeRepository;
 import edu.pe.upao.friendlyfitnessbackend.repositories.RoutinesRepository;
@@ -19,6 +20,9 @@ public class ChallengeService {
         this.challengeRepository = challengeRepository;
     }
 
+    private boolean isEmptyOrWhitespace(String value) {
+        return value == null || value.trim().isEmpty();
+    }
     public List<Challenge> getAllChallenges(){
         return challengeRepository.findAll();
     }
@@ -27,11 +31,12 @@ public class ChallengeService {
         return challengeRepository.findById(challengeID);
     }
 
-    public Challenge addChallenge(Challenge challengeID){
-        return challengeRepository.save(challengeID);
+    public String addChallenge(Challenge challenge){
+        if (isEmptyOrWhitespace(challenge.getVideo()) || isEmptyOrWhitespace(String.valueOf(challenge.getTime())) || challenge.getRoutine() == null) {
+            throw new IllegalStateException("Todos los campos (video, time, routine) son requeridos");
+        }
+        challengeRepository.save(challenge);
+        return "Reto guardado correctamente";
     }
 
-    public void deleteChallengeById(Long challengeID){
-        challengeRepository.deleteById(challengeID);
-    }
 }

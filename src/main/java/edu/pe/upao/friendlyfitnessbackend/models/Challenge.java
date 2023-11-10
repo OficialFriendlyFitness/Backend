@@ -1,5 +1,6 @@
 package edu.pe.upao.friendlyfitnessbackend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Challenge {
     @Id
+    @JsonIgnore
     @Column(name = "challenge_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long challengeID;

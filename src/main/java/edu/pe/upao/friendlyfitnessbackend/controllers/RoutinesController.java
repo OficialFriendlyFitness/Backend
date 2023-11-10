@@ -1,7 +1,10 @@
 package edu.pe.upao.friendlyfitnessbackend.controllers;
 
+import edu.pe.upao.friendlyfitnessbackend.Dtos.RoutinesDTO;
 import edu.pe.upao.friendlyfitnessbackend.models.Routine;
 import edu.pe.upao.friendlyfitnessbackend.services.RoutinesService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,22 +18,18 @@ public class RoutinesController {
         this.routinesService = routinesService;
     }
     @GetMapping
-    private List<Routine> getAllRoutines(){
+    private List<RoutinesDTO> getAllRoutines(){
         return routinesService.getAllRoutines();
     }
 
     @PostMapping
-    public void addRoutine(@RequestBody Routine routine){
-        routinesService.addRoutine(routine);
+    public ResponseEntity<String> addRoutine(@RequestBody Routine routine) {
+        try {
+            String newRoutine = routinesService.addRoutine(routine);
+            return new ResponseEntity<>(newRoutine, HttpStatus.CREATED);
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
-    @PutMapping
-    public void addRoutine(@RequestBody Routine routine, @PathVariable Long routinesID){
-        routinesService.updateRoutine(routine, routinesID);
-    }
-
-    @DeleteMapping("/{routinesID}")
-    public void deleteRoutine(@PathVariable Long routinesID){
-        routinesService.deleteRoutineById(routinesID);
-    }
 }
