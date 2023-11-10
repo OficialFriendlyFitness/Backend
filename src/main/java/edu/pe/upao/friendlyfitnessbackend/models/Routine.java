@@ -1,8 +1,10 @@
 package edu.pe.upao.friendlyfitnessbackend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -11,7 +13,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Routine {
+    @Getter
     @Id
+    @JsonIgnore
     @Column(name = "routines_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long routinesID;
@@ -27,10 +31,6 @@ public class Routine {
     @ManyToOne
     @JoinColumn(name = "client_id")
     private Client client;
-
-    public Long getRoutinesID() {
-        return routinesID;
-    }
 
     public void setRoutinesID(Long routinesID) {
         this.routinesID = routinesID;
