@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 public class Routine {
     @Getter
     @Id
-    @JsonIgnore
     @Column(name = "routines_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long routinesID;

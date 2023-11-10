@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Challenge {
     @Id
-    @JsonIgnore
     @Column(name = "challenge_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long challengeID;

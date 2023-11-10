@@ -27,7 +27,7 @@ public class RoutinesController {
         try {
             String newRoutine = routinesService.addRoutine(routine);
             return new ResponseEntity<>(newRoutine, HttpStatus.CREATED);
-        } catch (IllegalArgumentException | IllegalStateException ex) {
+        } catch (IllegalStateException ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }

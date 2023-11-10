@@ -16,7 +16,6 @@ public class Client {
     @Id
     @Column(name = "client_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore
     private Long clientID;
     @Column(name = "firs_name")
     private String firstName;

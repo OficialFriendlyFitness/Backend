@@ -11,10 +11,11 @@ public class ChallengeDTO {
     private RoutinesDTO routinesDTO;
 
     public ChallengeDTO(Challenge challenge) {
-        this.time = time;
-        this.video = video;
-        this.routinesDTO = routinesDTO;
-
+        this.time = challenge.getTime();
+        this.video = challenge.getVideo();
+        if (challenge.getRoutine() != null) {
+            this.routinesDTO = new RoutinesDTO(challenge.getRoutine());
+        }
     }
 
     public void setTime(int time) {
