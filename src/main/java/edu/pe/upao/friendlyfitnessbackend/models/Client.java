@@ -1,18 +1,20 @@
 package edu.pe.upao.friendlyfitnessbackend.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
 
 @Entity
 @Table(name = "clients")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Client {
+public class Client implements UserDetails {
     @Id
     @Column(name = "client_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +30,6 @@ public class Client {
     @Column(name = "age")
     private int age;
     @Column(name = "cell_phone")
-    @Size(max = 9, message = "El número de teléfono debe tener como máximo 9 caracteres")
     private String cell;
     @Column(name = "tastes")
     private String tastes;
@@ -75,5 +76,36 @@ public class Client {
 
     public void setPreferences(String preferences) {
         this.preferences = preferences;
+    }
+
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
