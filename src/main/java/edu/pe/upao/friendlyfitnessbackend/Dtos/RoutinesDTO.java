@@ -19,7 +19,7 @@ public class RoutinesDTO {
         this.exercise = routine.getExercise();
 
         if (routine.getClient() != null) {
-            this.clientDTO = new ClientDTO(routine.getClient());
+            this.clientDTO = new ClientDTO(routine.getClient().getEmail());
         }
     }
 
