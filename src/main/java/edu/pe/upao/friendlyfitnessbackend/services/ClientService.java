@@ -5,8 +5,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import edu.pe.upao.friendlyfitnessbackend.models.Client;
 
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.Optional;
 
 @Service
@@ -65,42 +63,13 @@ public class ClientService {
         if (client.getPassword().length() < 8 || client.getPassword().length() > 16) {
             throw new IllegalStateException("La contraseña debe tener entre 8 y 16 caracteres");
         }
-     /* if (!containsSymbol(client.getPassword()) || !containsUpperCase(client.getPassword()) || !containsLowerCase(client.getPassword())) {
-        throw new IllegalStateException("La contraseña debe contener símbolos, letras mayúsculas y minúsculas");
-        }  */
+
         clientRepository.save(client);
         return "Usuario registrado correctamente";
     }
 
-    /* public boolean containsSymbol(String password) {
-           return Pattern.compile("[!@#$%^&*(),.?\":{}|<>]").matcher(password).find();
-       }
-
-       public boolean containsUpperCase(String password) {
-           return Pattern.compile("[A-Z]").matcher(password).find();
-       }
-
-       public boolean containsLowerCase(String password) {
-           return Pattern.compile("[a-z]").matcher(password).find();
-       }
-   */
     private boolean containsNumbers(String input) {
         return input.matches(".*\\d.*");
     }
-    public Client login(String email, String password) {
-        if (isEmptyOrWhitespace(email) || isEmptyOrWhitespace(password)) {
-            throw new IllegalStateException("Correo y contraseña son campos requeridos");
-        }
-        Optional<Client> existingUserByCount = clientRepository.findByEmail(email);
-        if (!existingUserByCount.isEmpty()) {
-            Client useremail = existingUserByCount.get();
-            if (useremail.getPassword().equals(password)) {
-                return useremail;
-            } else {
-                throw new IllegalStateException("contraseña incorrecta");
-            }
-        } else {
-            throw new IllegalStateException("Correo y contraseña incorrectas");
-        }
-    }
+
 }

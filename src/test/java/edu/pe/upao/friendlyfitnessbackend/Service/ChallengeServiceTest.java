@@ -86,3 +86,4 @@ class ChallengeServiceTest {
         verify(challengeRepository, never()).save(any(Challenge.class));
     }
 }
+

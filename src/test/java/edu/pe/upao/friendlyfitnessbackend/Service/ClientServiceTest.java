@@ -1,189 +1,195 @@
 package edu.pe.upao.friendlyfitnessbackend.Service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
+import edu.pe.upao.friendlyfitnessbackend.Dtos.ClientDTO;
 import edu.pe.upao.friendlyfitnessbackend.models.Client;
 import edu.pe.upao.friendlyfitnessbackend.repositories.ClientRepository;
 import edu.pe.upao.friendlyfitnessbackend.services.ClientService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.MockitoAnnotations;
 
-@SpringBootTest
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 class ClientServiceTest {
-
     @Mock
     private ClientRepository clientRepository;
 
     @InjectMocks
     private ClientService clientService;
 
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
     @Test
-    void testUpdateClient() {
+    public void testUpdateClient() {
         // Arrange
+        Client updatedClient = new Client();
+        updatedClient.setFirstName("John");
+        updatedClient.setLastName("Doe");
+        updatedClient.setCell("123456789");
+        updatedClient.setTastes("Fitness");
+        updatedClient.setExpectations("Lose weight");
+        updatedClient.setPreferences("Healthy diet");
+
         Long clientId = 1L;
         Client existingClient = new Client();
-        existingClient.setFirstName("John");
-        existingClient.setLastName("Doe");
-
-        Client updatedClient = new Client();
-        updatedClient.setFirstName("Jane");
-        updatedClient.setLastName("Doe");
+        existingClient.setClientID(clientId);
+        existingClient.setFirstName("Old");
+        existingClient.setLastName("Client");
 
         when(clientRepository.findById(clientId)).thenReturn(Optional.of(existingClient));
-        when(clientRepository.save(any(Client.class))).thenReturn(updatedClient);
 
         // Act
         String result = clientService.updateClient(updatedClient, clientId);
 
         // Assert
         assertEquals("Cliente actualizado correctamente", result);
-        assertEquals("Jane", existingClient.getFirstName());
+        assertEquals("John", existingClient.getFirstName());
         assertEquals("Doe", existingClient.getLastName());
+        assertEquals("123456789", existingClient.getCell());
+        assertEquals("Fitness", existingClient.getTastes());
+        assertEquals("Lose weight", existingClient.getExpectations());
+        assertEquals("Healthy diet", existingClient.getPreferences());
 
         verify(clientRepository, times(1)).findById(clientId);
         verify(clientRepository, times(1)).save(existingClient);
     }
 
     @Test
-    void testViewProfile() {
+    public void testViewProfile() {
         // Arrange
         Long clientId = 1L;
-        Client expectedClient = new Client();
-        expectedClient.setFirstName("John");
-        expectedClient.setLastName("Doe");
-
-        when(clientRepository.findById(clientId)).thenReturn(Optional.of(expectedClient));
+        Client client = new Client();
+        client.setClientID(clientId);
+        client.setFirstName("John");
+        client.setLastName("Doe");
+        when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
 
         // Act
-        Client result = clientService.viewProfile(clientId);
+        ClientDTO clientDTO = clientService.viewProfile(clientId);
 
         // Assert
-        assertEquals(expectedClient, result);
+        assertNotNull(clientDTO);
+        assertEquals("John", clientDTO.getFirstName());
+        assertEquals("Doe", clientDTO.getLastName());
 
         verify(clientRepository, times(1)).findById(clientId);
     }
 
     @Test
-    void testAddClient_Success() {
+    public void testAddClient() {
         // Arrange
         Client newClient = new Client();
         newClient.setFirstName("John");
         newClient.setLastName("Doe");
         newClient.setEmail("john.doe@example.com");
-        newClient.setPassword("securePassword");
+        newClient.setPassword("password");
+        newClient.setAge(25);
 
-        when(clientRepository.findByEmail(newClient.getEmail())).thenReturn(Arrays.asList());
-        when(clientRepository.save(any(Client.class))).thenReturn(newClient);
+        when(clientRepository.findByEmail(newClient.getEmail())).thenReturn(Optional.empty());
 
         // Act
         String result = clientService.addClient(newClient);
 
         // Assert
         assertEquals("Usuario registrado correctamente", result);
-
         verify(clientRepository, times(1)).findByEmail(newClient.getEmail());
         verify(clientRepository, times(1)).save(newClient);
     }
+    @Test
+    public void testUpdateClient_ClientNotFound() {
+        // Arrange
+        Long clientId = 1L;
+        Client updatedClient = new Client();
+
+        when(clientRepository.findById(clientId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> clientService.updateClient(updatedClient, clientId));
+
+        verify(clientRepository, times(1)).findById(clientId);
+        verify(clientRepository, never()).save(any());
+    }
 
     @Test
-    void testAddClient_EmailInUse() {
+    public void testUpdateClient_InvalidFields() {
         // Arrange
-        Client existingClient = new Client();
-        existingClient.setEmail("john.doe@example.com");
+        Long clientId = 1L;
+        Client updatedClient = new Client();
 
+        when(clientRepository.findById(clientId)).thenReturn(Optional.of(new Client()));
+
+        // Act & Assert
+        assertThrows(IllegalStateException.class, () -> clientService.updateClient(updatedClient, clientId));
+
+        verify(clientRepository, times(1)).findById(clientId);
+        verify(clientRepository, never()).save(any());
+    }
+
+    @Test
+    public void testAddClient_EmailInUse() {
+        // Arrange
         Client newClient = new Client();
-        newClient.setEmail("john.doe@example.com");
+        newClient.setEmail("existing.email@example.com");
 
-        when(clientRepository.findByEmail(newClient.getEmail())).thenReturn(Arrays.asList(existingClient));
+        when(clientRepository.findByEmail(newClient.getEmail())).thenReturn(Optional.of(new Client()));
 
-        // Act and Assert
+        // Act & Assert
         assertThrows(IllegalStateException.class, () -> clientService.addClient(newClient));
 
         verify(clientRepository, times(1)).findByEmail(newClient.getEmail());
-        verify(clientRepository, never()).save(any(Client.class));
+        verify(clientRepository, never()).save(any());
     }
-
     @Test
-    void testAddClient_PasswordLengthInvalid() {
+    public void testAddClient_Underage() {
         // Arrange
         Client newClient = new Client();
+        newClient.setEmail("new.email@example.com");
+        newClient.setFirstName("John");
+        newClient.setLastName("Doe");
+        newClient.setAge(17);
+
+        // Act & Assert
+        assertThrows(IllegalStateException.class, () -> clientService.addClient(newClient));
+
+        verify(clientRepository, times(1)).findByEmail(newClient.getEmail());
+        verify(clientRepository, never()).save(any());
+    }
+    @Test
+    public void testAddClient_ContainsNumbersInNameOrLastName() {
+        // Arrange
+        Client newClient = new Client();
+        newClient.setEmail("new.email@example.com");
+        newClient.setFirstName("John123");
+        newClient.setLastName("Doe");
+
+        // Act & Assert
+        assertThrows(IllegalStateException.class, () -> clientService.addClient(newClient));
+
+        verify(clientRepository, times(1)).findByEmail(newClient.getEmail());
+        verify(clientRepository, never()).save(any());
+    }
+    @Test
+    public void testAddClient_PasswordLengthOutOfRange() {
+        // Arrange
+        Client newClient = new Client();
+        newClient.setEmail("new.email@example.com");
+        newClient.setFirstName("John");
+        newClient.setLastName("Doe");
         newClient.setPassword("short");
 
-        // Act and Assert
+        // Act & Assert
         assertThrows(IllegalStateException.class, () -> clientService.addClient(newClient));
 
-        verify(clientRepository, never()).findByEmail(anyString());
-        verify(clientRepository, never()).save(any(Client.class));
+        verify(clientRepository, times(1)).findByEmail(newClient.getEmail());
+        verify(clientRepository, never()).save(any());
     }
 
-    @Test
-    void testAddClient_PasswordFormatInvalid() {
-        // Arrange
-        Client newClient = new Client();
-        newClient.setPassword("password123"); // No symbols
-
-        // Act and Assert
-        assertThrows(IllegalStateException.class, () -> clientService.addClient(newClient));
-
-        verify(clientRepository, never()).findByEmail(anyString());
-        verify(clientRepository, never()).save(any(Client.class));
-    }
-
-    @Test
-    void testLogin_Success() {
-        // Arrange
-        String email = "john.doe@example.com";
-        String password = "securePassword";
-        Client existingClient = new Client();
-        existingClient.setEmail(email);
-        existingClient.setPassword(password);
-
-        when(clientRepository.findByEmail(email)).thenReturn(Arrays.asList(existingClient));
-
-        // Act
-        Client result = clientService.login(email, password);
-
-        // Assert
-        assertEquals(existingClient, result);
-
-        verify(clientRepository, times(1)).findByEmail(email);
-    }
-
-    @Test
-    void testLogin_IncorrectPassword() {
-        // Arrange
-        String email = "john.doe@example.com";
-        String password = "wrongPassword";
-        Client existingClient = new Client();
-        existingClient.setEmail(email);
-        existingClient.setPassword("securePassword");
-
-        when(clientRepository.findByEmail(email)).thenReturn(Arrays.asList(existingClient));
-
-        // Act and Assert
-        assertThrows(IllegalStateException.class, () -> clientService.login(email, password));
-
-        verify(clientRepository, times(1)).findByEmail(email);
-    }
-
-    @Test
-    void testLogin_IncorrectEmail() {
-        // Arrange
-        String email = "nonexistent@example.com";
-        String password = "securePassword";
-
-        when(clientRepository.findByEmail(email)).thenReturn(Arrays.asList());
-
-        // Act and Assert
-        assertThrows(IllegalStateException.class, () -> clientService.login(email, password));
-
-        verify(clientRepository, times(1)).findByEmail(email);
-    }
 }
